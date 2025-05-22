@@ -10,11 +10,11 @@ app.use(cors());
 app.use(bodyParser.json({ limit: '5mb' }));
 
 const db = mysql.createPool({
-    host: 'localhost',
+    host: 'shortline.proxy.rlwy.net',
     user: 'root',
-    password: 'jk2h3fIUl2k3jriIQJKK!',
-    database: 'hotel_db',
-    port: 3306,
+    password: 'NyaVRdIObTRFjlRDlYfhWeQljPeeepSK',
+    database: 'railway',
+    port: 55918,
     waitForConnections: true,
     connectionLimit: 10,
     queueLimit: 0
