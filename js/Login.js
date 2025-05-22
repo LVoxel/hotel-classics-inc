@@ -42,7 +42,7 @@ document.addEventListener('DOMContentLoaded', function () {
 function checkUserExists() {
     const currentUser = JSON.parse(localStorage.getItem('currentUser'));
     if (!currentUser) return;
-    fetch(`http://localhost:3001/api/users`)
+    fetch(`http://shortline.proxy.rlwy.net/api/users`)
         .then(res => res.json())
         .then(users => {
             const exists = users.some(u => u.id === currentUser.id);
