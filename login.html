@@ -80,7 +80,7 @@
             const email = document.getElementById('register-email').value.trim();
             const password = document.getElementById('register-password').value.trim();
 
-            fetch('https://shortline.proxy.rlwy.net/api/users', {
+            fetch('http://shortline.proxy.rlwy.net/api/users', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ name, email, password })
@@ -106,7 +106,7 @@
             const email = document.getElementById('login-email').value.trim();
             const password = document.getElementById('login-password').value.trim();
 
-            fetch('https://shortline.proxy.rlwy.net/api/login', {
+            fetch('http://shortline.proxy.rlwy.net/api/login', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ email, password })
