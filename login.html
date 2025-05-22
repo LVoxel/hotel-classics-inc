@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login / Registration</title>
+    <link rel="stylesheet" href="style.css" />
+</head>
+
+<body>
+
+    <header>
+        <div class="container">
+            <nav>
+                <div class="logo"><a href="index.html" style="color: inherit; text-decoration: none;">Classics</a></div>
+                <div class="nav-links">
+                    <a href="index.html">Home</a>
+                    <a href="Rooms.html">Rooms</a>
+                    <a href="Info.html">About</a>
+                </div>
+                <a href="login.html" class="btn" id="login-btn">Login</a>
+            </nav>
+        </div>
+    </header>
+    <section class="auth-section">
+        <div class="auth-box fade-in-scale">
+            <div id="login-form">
+                <h2>Login</h2>
+                <form>
+                    <label for="login-email">Email</label>
+                    <input type="email" id="login-email" placeholder="Type email" required>
+
+                    <label for="login-password">Password</label>
+                    <input type="password" id="login-password" placeholder="Type password" required>
+
+                    <button type="submit" class="btn auth-btn">Login</button>
+                </form>
+                <div class="toggle-link">
+                    Don't have an account? <a onclick="toggleForms()">Register</a>
+                </div>
+            </div>
+
+            <div id="register-form" class="hidden fade-in-scale">
+                <h2>Registration</h2>
+                <form>
+                    <label for="register-name">Name</label>
+                    <input type="text" id="register-name" placeholder="Type name" required>
+
+                    <label for="register-email">Email</label>
+                    <input type="email" id="register-email" placeholder="Type email" required>
+
+                    <label for="register-password">Password</label>
+                    <input type="password" id="register-password" placeholder="Type password" required>
+
+                    <button type="submit" class="btn auth-btn">Register</button>
+                </form>
+                <div class="toggle-link">
+                    Already have an account? <a onclick="toggleForms()">Login</a>
+                </div>
+            </div>
+        </div>
+    </section>
+    <div id="notification" class="notification hidden"></div>
+    <script src="js/FadeInScale.js"></script>
+    <script src="js/Notification.js"></script>
+    <script>
+        function toggleForms() {
+            const loginForm = document.getElementById('login-form');
+            const registerForm = document.getElementById('register-form');
+            loginForm.classList.toggle('hidden');
+            registerForm.classList.toggle('hidden');
+        }
+
+        // Регистрация
+        document.querySelector('#register-form form').addEventListener('submit', function (e) {
+            e.preventDefault();
+
+            const name = document.getElementById('register-name').value.trim();
+            const email = document.getElementById('register-email').value.trim();
+            const password = document.getElementById('register-password').value.trim();
+
+            fetch('http://localhost:3001/api/users', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ name, email, password })
+            })
+                .then(res => res.json())
+                .then(data => {
+                    if (data.error) {
+                        showNotification(data.error, 'error');
+                    } else {
+                        showNotification('Registration successful! You can now log in.', 'success');
+                        setTimeout(() => {
+                            document.querySelector('#register-form form').reset();
+                            toggleForms();
+                        }, 1200);
+                    }
+                });
+        });
+
+        // Вход
+        document.querySelector('#login-form form').addEventListener('submit', function (e) {
+            e.preventDefault();
+
+            const email = document.getElementById('login-email').value.trim();
+            const password = document.getElementById('login-password').value.trim();
+
+            fetch('http://localhost:3001/api/login', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ email, password })
+            })
+                .then(res => res.json())
+                .then(data => {
+                    if (data.error) {
+                        showNotification(data.error, 'error');
+                    } else {
+                        showNotification('Login successful!', 'success');
+                        localStorage.setItem('currentUser', JSON.stringify(data));
+                        setTimeout(() => {
+                            window.location.href = 'index.html';
+                        }, 1200);
+                    }
+                });
+        });
+
+    </script>
+
+</body>
+
+</html>

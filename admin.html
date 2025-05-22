@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Admin Panel - Classics Inc.</title>
+    <link rel="stylesheet" href="style.css" />
+</head>
+
+<body>
+    <header>
+        <div class="container">
+            <nav>
+                <div class="logo"><a href="index.html" style="color: inherit; text-decoration: none;">Classics</a></div>
+                <div class="nav-links">
+                    <a href="index.html">Home</a>
+                    <a href="Rooms.html">Rooms</a>
+                    <a href="Info.html">About</a>
+                </div>
+                <div id="user-section">
+                    <a href="login.html" class="btn" id="login-btn">Login</a>
+                </div>
+            </nav>
+        </div>
+    </header>
+
+    <main class="container">
+        <section class="section">
+            <h1 class="section-title">Admin Panel</h1>
+
+            <!-- Блок добавления комнаты -->
+            <div class="admin-controls">
+                <h2>Add New Room</h2>
+                <form id="add-room-form" class="form">
+                    <input type="text" id="room-name" placeholder="Room Name" required />
+
+                    <select id="room-type" required>
+                        <option value="">Select Room Type</option>
+                        <option value="standard">Standard</option>
+                        <option value="deluxe">Deluxe</option>
+                        <option value="suite">Suite</option>
+                    </select>
+
+                    <input type="number" id="room-price" placeholder="Price" required min="0" />
+                    <input type="number" id="room-guests" placeholder="Guests" required min="1" max="10" />
+
+                    <input type="text" id="room-image" placeholder="Image URL" />
+                    <input type="file" id="room-image-file" accept="image/*" style="grid-column:1/-1;" />
+                    <img id="room-image-preview" src="" alt="Preview"
+                        style="display:none; max-width:180px; margin:8px 0; border-radius:8px; grid-column:1/-1;" />
+
+                    <label for="room-description" style="grid-column:1/-1;">Description</label>
+                    <textarea id="room-description" placeholder="Description" rows="3"
+                        style="resize:vertical; grid-column:1/-1;" required></textarea>
+
+                    <input type="number" id="room-rating" placeholder="Rating (0-5)" min="0" max="5" step="0.1"
+                        required />
+
+                    <div style="display:flex; gap:24px; align-items:center; grid-column:1/-1;">
+                        <label style="display:flex;align-items:center;gap:8px;">
+                            <input type="checkbox" id="room-available" checked />
+                            Available
+                        </label>
+                        <label style="display:flex;align-items:center;gap:8px;">
+                            <input type="checkbox" id="room-discounted" />
+                            Discounted
+                        </label>
+                    </div>
+
+                    <label for="room-booked-dates" style="grid-column:1/-1;">Booked Dates (comma separated)</label>
+                    <textarea id="room-booked-dates" placeholder="YYYY-MM-DD, YYYY-MM-DD" rows="2"
+                        style="resize:vertical; grid-column:1/-1;"></textarea>
+
+                    <button type="submit" class="btn" style="grid-column:1/-1;">Add Room</button>
+                </form>
+            </div>
+
+            <!-- Список всех комнат -->
+            <div>
+                <h2>All Rooms</h2>
+                <table class="admin-table" id="room-table">
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>Title</th>
+                            <th>Description</th>
+                            <th>Image</th>
+                            <th>Rating</th>
+                            <th>Booked Dates</th>
+                            <th>Available</th>
+                            <th>Discounted</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="room-list"></tbody>
+                </table>
+                <div id="no-rooms-msg" style="display:none; margin-top:1em;">No rooms found.</div>
+            </div>
+        </section>
+    </main>
+
+    <script src="js/Login.js"></script>
+    <script>
+        const currentUser = JSON.parse(localStorage.getItem('currentUser'));
+        if (!currentUser || !currentUser.isAdmin) {
+            alert("Access denied");
+            window.location.href = "index.html";
+        }
+
+        function logout() {
+            localStorage.removeItem('currentUser');
+            window.location.href = "login.html";
+        }
+
+        let rooms = [];
+
+        function renderRooms() {
+            const tbody = document.getElementById('room-list');
+            const noRoomsMsg = document.getElementById('no-rooms-msg');
+            tbody.innerHTML = '';
+            if (rooms.length === 0) {
+                noRoomsMsg.style.display = '';
+                return;
+            }
+            noRoomsMsg.style.display = 'none';
+            rooms.forEach((room, index) => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td>${index + 1}</td>
+                    <td>${room.name}</td>
+                    <td>${room.description}</td>
+                    <td>
+                        <img src="${room.image}" alt="${room.name}">
+                    </td>
+                    <td>${room.rating ?? '—'} ⭐</td>
+                    <td style="min-width:130px;">
+                        ${(room.bookedDates && room.bookedDates.length)
+                        ? room.bookedDates.map(date => `<span class="booked-date">${date}</span>`).join('')
+                        : '—'}
+                    </td>
+                    <td>
+                        ${room.available
+                        ? `<span class="available-badge">✔ Available</span>`
+                        : `<span class="available-badge not-available">✖ Not Available</span>`
+                    }
+                    </td>
+                    <td>
+                        ${room.discounted
+                        ? `<span class="discounted-badge">Discounted</span>`
+                        : `<span class="discounted-badge not-discounted">—</span>`
+                    }
+                    </td>
+                    <td>
+                        <div class="action-buttons">
+                            <button class="btn btn-outline btn-edit" data-id="${room.id}">Edit</button>
+                            <button class="btn btn-outline btn-delete" data-id="${room.id}">Delete</button>
+                        </div>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        function fetchRooms() {
+            fetch('http://localhost:3001/api/rooms')
+                .then(res => res.json())
+                .then(data => {
+                    rooms = data;
+                    renderRooms();
+                });
+        }
+
+        // Удаление комнаты
+        document.getElementById('room-table').addEventListener('click', function (e) {
+            // Удаление
+            if (e.target.classList.contains('btn-delete')) {
+                const id = e.target.getAttribute('data-id');
+                if (id) {
+                    fetch(`http://localhost:3001/api/rooms/${id}`, { method: 'DELETE' })
+                        .then(() => fetchRooms());
+                }
+            }
+            // Редактирование
+            if (e.target.classList.contains('btn-edit')) {
+                const id = e.target.getAttribute('data-id');
+                const room = rooms.find(r => r.id == id);
+                if (room) {
+                    document.getElementById('room-name').value = room.name;
+                    document.getElementById('room-type').value = room.type;
+                    document.getElementById('room-price').value = room.price;
+                    document.getElementById('room-guests').value = room.guests;
+                    document.getElementById('room-image').value = room.image;
+                    document.getElementById('room-description').value = room.description;
+                    document.getElementById('room-rating').value = room.rating ?? '';
+                    document.getElementById('room-booked-dates').value = (room.bookedDates || []).join(', ');
+                    document.getElementById('add-room-form').setAttribute('data-edit-id', id);
+                    document.querySelector('#add-room-form button[type="submit"]').textContent = 'Save Changes';
+                    document.getElementById('room-available').checked = !!room.available;
+                    document.getElementById('room-discounted').checked = !!room.discounted;
+                }
+            }
+        });
+
+        // Добавление комнаты
+        document.getElementById('add-room-form').addEventListener('submit', function (e) {
+            e.preventDefault();
+            const name = document.getElementById('room-name').value.trim();
+            const type = document.getElementById('room-type').value.trim();
+            const price = parseInt(document.getElementById('room-price').value, 10);
+            const guests = parseInt(document.getElementById('room-guests').value, 10);
+            const image = document.getElementById('room-image').value.trim();
+            const description = document.getElementById('room-description').value.trim();
+            const rating = parseFloat(document.getElementById('room-rating').value);
+            const bookedDatesRaw = document.getElementById('room-booked-dates').value.trim();
+            const bookedDates = bookedDatesRaw
+                ? bookedDatesRaw.split(',').map(d => d.trim()).filter(Boolean)
+                : [];
+
+            const available = document.getElementById('room-available').checked;
+            const discounted = document.getElementById('room-discounted').checked;
+
+            if (!name || !type || !price || !guests || !image || !description || isNaN(rating)) return;
+
+            const editId = this.getAttribute('data-edit-id');
+            const roomData = {
+                name, type, price, guests, image, description,
+                available,
+                discounted,
+                rating,
+                bookedDates
+            };
+
+            if (editId) {
+                // Редактирование
+                fetch(`http://localhost:3001/api/rooms/${editId}`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(roomData)
+                })
+                    .then(() => {
+                        fetchRooms();
+                        this.reset();
+                        this.removeAttribute('data-edit-id');
+                        document.querySelector('#add-room-form button[type="submit"]').textContent = 'Add Room';
+                    });
+            } else {
+                // Добавление
+                fetch('http://localhost:3001/api/rooms', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(roomData)
+                })
+                    .then(() => {
+                        fetchRooms();
+                        this.reset();
+                    });
+            }
+        });
+
+        document.getElementById('room-image-file').addEventListener('change', function (e) {
+            const file = e.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = function (evt) {
+                document.getElementById('room-image').value = evt.target.result;
+                document.getElementById('room-image-preview').src = evt.target.result;
+                document.getElementById('room-image-preview').style.display = 'block';
+            };
+            reader.readAsDataURL(file);
+        });
+
+        // Показывать превью, если вставили ссылку вручную
+        document.getElementById('room-image').addEventListener('input', function (e) {
+            const url = e.target.value.trim();
+            const preview = document.getElementById('room-image-preview');
+            if (url) {
+                preview.src = url;
+                preview.style.display = 'block';
+            } else {
+                preview.style.display = 'none';
+            }
+        });
+
+        fetchRooms();
+    </script>
+</body>
+
+</html>

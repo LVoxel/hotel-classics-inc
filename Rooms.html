@@ -1,0 +1,603 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Classics Inc. - Available Rooms</title>
+    <link rel="stylesheet" href="style.css" />
+    <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+</head>
+
+<body>
+    <header>
+        <div class="container">
+            <nav>
+                <div class="logo"><a href="index.html" style="color: inherit; text-decoration: none;">Classics</a></div>
+                <div class="nav-links">
+                    <a href="index.html">Home</a>
+                    <a href="Rooms.html">Rooms</a>
+                    <a href="Info.html">About</a>
+                </div>
+                <div id="user-section">
+                    <a href="login.html" class="btn" id="login-btn">Login</a>
+                </div>
+            </nav>
+        </div>
+    </header>
+
+    <main>
+        <section class="page-header">
+            <div class="container">
+                <h1>Our Rooms</h1>
+                <p>Explore our collection of classic yet modern rooms designed for your comfort and convenience.</p>
+            </div>
+        </section>
+
+        <div class="container">
+            <section class="search-widget fade-in-scale">
+                <h3>Find Your Perfect Room</h3>
+                <form class="search-form">
+                    <div class="form-group">
+                        <label for="check-in">Check-in Date</label>
+                        <input type="date" id="check-in" name="check-in">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="check-out">Check-out Date</label>
+                        <input type="date" id="check-out" name="check-out">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="guests">Guests</label>
+                        <select id="guests" name="guests">
+                            <option value="1" selected>1 Guest</option>
+                            <option value="2">2 Guests</option>
+                            <option value="3">3 Guests</option>
+                            <option value="4">4 Guests</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="room-type">Room Type</label>
+                        <select id="room-type" name="room-type">
+                            <option value="all" selected>All Types</option>
+                            <option value="standard">Standard</option>
+                            <option value="deluxe">Deluxe</option>
+                            <option value="suite">Suite</option>
+                        </select>
+                    </div>
+
+                    <button type="submit" class="search-btn">Search Availability</button>
+                </form>
+            </section>
+
+            <section class="rooms-section">
+                <div class="room-filters">
+                    <div class="filter-options">
+                        <select name="sort-by" class="fade-in-scale">
+                            <option value="recommended">Recommended</option>
+                            <option value="price-low">Price: Low to High</option>
+                            <option value="price-high">Price: High to Low</option>
+                            <option value="rating">Guest Rating</option>
+                        </select>
+
+                        <select name="filter-by" class="fade-in-scale">
+                            <option value="all-rooms">All Rooms</option>
+                            <option value="available">Available Only</option>
+                            <option value="discounted">Discounted Only</option>
+                        </select>
+                    </div>
+
+                </div>
+                <div id="room-container"></div>
+
+            </section>
+        </div>
+    </main>
+
+    <footer>
+        <div class="container">
+            <div class="footer-company">
+                <h3>CLASSICS, INC.</h3>
+            </div>
+            <div class="footer-content">
+                <div class="footer-links">
+                    <h4>Explore</h4>
+                    <ul>
+                        <li><a href="Rooms.html">Rooms</a></li>
+                        <li><a href="Info.html">About Us</a></li>
+                    </ul>
+                </div>
+                <div class="footer-links">
+                    <h4>Legal</h4>
+                    <ul>
+                        <li><a href="privacy.html">Privacy Policy</a></li>
+                        <li><a href="terms.html">Terms & Conditions</a></li>
+                    </ul>
+                </div>
+                <div class="footer-links">
+                    <h4>Support</h4>
+                    <ul>
+                        <li><a href="Info.html#faq">FAQ</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </footer>
+    <div id="booking-modal" class="modal hidden">
+        <div id="booking-modal-info" class="modal-content two-columns">
+            <span class="close-btn">&times;</span>
+            <div class="modal-left" id="room-info">
+                <!-- Информация о комнате вставляется сюда -->
+            </div>
+
+            <div class="modal-right">
+                <div id="booking-form-section">
+                    <h2>Complete Your Booking</h2>
+                    <form id="payment-form">
+                        <div class="form-group">
+                            <label for="card-number">Card Number</label>
+                            <input type="text" id="card-number" placeholder="1234 5678 9012 3456" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="card-name">Cardholder Name</label>
+                            <input type="text" id="card-name" placeholder="John Doe" required>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group half">
+                                <label for="card-expiry">Expiry Date</label>
+                                <input type="text" id="card-expiry" placeholder="MM/YY" required>
+                            </div>
+                            <div class="form-group half">
+                                <label for="card-cvc">CVC</label>
+                                <input maxlength="3" type="text" id="card-cvc" placeholder="123" required>
+                            </div>
+                        </div>
+                        <button type="submit" class="btn btn-pay">Pay Now</button>
+                    </form>
+                </div>
+
+                <!-- Квитанция. изначально скрыта -->
+                <div id="receipt-in-modal" class="modal-right hidden">
+                    <h2>Booking Receipt</h2>
+                    <div id="receipt-modal-content"></div>
+                    <button id="download-receipt-btn">Download Receipt</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="notification" class="notification hidden"></div>
+
+    <script src="https://cdn.jsdelivr.net/npm/qrious@4.0.2/dist/qrious.min.js"></script>
+    <script src="js/FadeInScale.js"></script>
+    <script src="js/Notification.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const typeSelect = document.querySelector('#room-type');
+            const filterSelect = document.querySelector('select[name="filter-by"]');
+            const sortSelect = document.querySelector('select[name="sort-by"]');
+            const guestsSelect = document.querySelector('#guests');
+            const checkInInput = document.querySelector('#check-in');
+            const checkOutInput = document.querySelector('#check-out');
+            const searchBtn = document.querySelector('.search-btn');
+
+            let availabilityChecked = false;
+
+            const roomContainer = document.querySelector('#room-container');
+            let roomsData = [];
+
+            const today = new Date().toISOString().split('T')[0];
+            checkInInput.min = today;
+
+            checkOutInput.disabled = true;
+
+            checkInInput.addEventListener('change', () => {
+                const checkInDate = checkInInput.value;
+                checkOutInput.min = checkInDate;
+
+                if (checkInDate) {
+                    checkOutInput.disabled = false;
+                    checkOutInput.min = checkInDate;
+                } else {
+                    checkOutInput.disabled = true;
+                    checkOutInput.value = '';
+                }
+
+                // Если check-out раньше check-in, обнуляем его
+                if (checkOutInput.value && checkOutInput.value < checkInDate) {
+                    checkOutInput.value = '';
+                }
+            });
+
+
+            let selectedRoom = null;
+
+            function createRoomCard(room) {
+                const card = document.createElement('div');
+                card.className = 'room-card';
+                card.innerHTML = `
+            <img src="${room.image}" alt="${room.name}" class="room-img fade-in-scale">
+            <div class="room-details">
+                <div class="room-header">
+                    <h3 class="room-name fade-in-scale">${room.name}</h3>
+                    <div class="room-price fade-in-scale">$${room.price} <span>per night</span></div>
+                </div>
+                <div class="room-features">
+                    <div class="feature fade-in-scale"><span>Guests: ${room.guests}</span></div>
+                    <div class="feature fade-in-scale"><span>Type: ${room.type}</span></div>
+                    <div class="feature fade-in-scale"><span>${room.available ? '✅ Available' : '❌ Not Available'}</span></div>
+                    ${room.discounted ? `<div class="feature fade-in-scale"><span>🔥 Discounted</span></div>` : ''}
+                </div>
+                <div class="room-description fade-in-scale">
+                    <p>${room.description || 'A comfortable room with everything you need for your stay.'}</p>
+                </div>
+                <div class="room-rating fade-in-scale">
+                    <span>Rating: ${room.rating ?? '—'} ⭐</span>
+                </div>
+                <div class="room-actions fade-in-scale">
+                    <button class="btn book-now-btn">Book Now</button>
+                </div>
+            </div>
+        `;
+                // Кнопка Book Now - открытие модального окна
+                const bookBtn = card.querySelector('.book-now-btn');
+                bookBtn.addEventListener('click', () => {
+                    if (!room.available) {
+                        showNotification('This room is not available for booking.', 'error');
+                        return;
+                    }
+                    selectedRoom = room;
+
+                    // Скрываем квитанцию
+                    document.getElementById('receipt-in-modal').classList.add('hidden');
+
+                    // Показываем форму
+                    document.getElementById('booking-form-section').classList.remove('hidden');
+
+                    const checkIn = checkInInput.value;
+                    const checkOut = checkOutInput.value;
+
+                    if (!checkIn || !checkOut || !availabilityChecked) {
+                        showNotification('Please select both "Check-in Date" and "Check-out Date". Then click on "Search Availability" before booking.');
+                        return;
+                    }
+                    const modal = document.getElementById('booking-modal');
+                    const roomInfo = modal.querySelector('#room-info');
+
+                    roomInfo.innerHTML = `
+            <h1>${room.name}</h1>
+            <div class="room-info">
+                <img id="modal-room-image" src="${room.image}" alt="${room.name}">
+            </div>
+            <h3>Price: $${room.price} per night</h3>
+            <h4>Guests: ${room.guests}</h4>
+            <h4>Type: ${room.type}</h4>
+            <h4>${room.description}</h4>
+            <h4>Rating: ${room.rating ?? '—'} ⭐</h4>
+        `;
+
+                    modal.classList.remove('hidden');
+
+                    // Скрываем старую квитанцию, если она есть
+                    document.getElementById('receipt-in-modal').classList.add('hidden');
+
+                    // Показываем обратно форму бронирования
+                    document.getElementById('booking-form-section').classList.remove('hidden');
+
+                    // Очищаем старое содержимое квитанции
+                    document.getElementById('receipt-modal-content').innerHTML = '';
+
+
+                });
+
+                return card;
+            }
+
+            // Закрытие модального окна с анимацией
+            document.querySelector('.close-btn').addEventListener('click', () => {
+                const modal = document.getElementById('booking-modal');
+                modal.classList.add('fade-out');
+                setTimeout(() => {
+                    modal.classList.add('hidden');
+                    modal.classList.remove('fade-out');
+                    window.location.reload();
+                }, 200);
+            });
+
+            function getDateRange(start, end) {
+                const range = [];
+                let current = new Date(start);
+                const last = new Date(end);
+                while (current <= last) {
+                    range.push(current.toISOString().split('T')[0]);
+                    current.setDate(current.getDate() + 1);
+                }
+                return range;
+            }
+
+            document.getElementById('payment-form').addEventListener('submit', function (e) {
+                e.preventDefault();
+
+                const cardNumber = document.getElementById('card-number').value.trim();
+                const cardName = document.getElementById('card-name').value.trim();
+                const expiry = document.getElementById('card-expiry').value.trim();
+                const cvc = document.getElementById('card-cvc').value.trim();
+
+                // Проверка заполненности
+                if (!cardNumber || !cardName || !expiry || !cvc) {
+                    showNotification('Please fill in all card fields.', 'error');
+                    return;
+                }
+
+                // Проверка номера карты (16 цифр)
+                if (!/^\d{4} \d{4} \d{4} \d{4}$/.test(cardNumber)) {
+                    showNotification('Enter a valid 16-digit card number.', 'error');
+                    return;
+                }
+
+                // Проверка имени (минимум 2 слова)
+                if (cardName.split(' ').length < 2) {
+                    showNotification('Enter the full cardholder name.', 'error');
+                    return;
+                }
+
+                // Проверка срока действия (MM/YY, месяц 01/12)
+                if (!/^(0[1-9]|1[0-2])\/\d{2}$/.test(expiry)) {
+                    showNotification('Enter a valid expiry date (MM/YY).', 'error');
+                    return;
+                }
+
+                // Проверка CVC (3 цифры)
+                if (!/^\d{3}$/.test(cvc)) {
+                    showNotification('Enter a valid 3-digit CVC.', 'error');
+                    return;
+                }
+
+                //получение данных для квитанции
+                const roomId = Number(selectedRoom.id);
+                const checkIn = document.getElementById('check-in').value;
+                const checkOut = document.getElementById('check-out').value;
+                const guests = document.getElementById('guests').value;
+                const name = document.getElementById('card-name').value;
+                const dateNow = new Date().toLocaleString();
+                const roomTitle = document.querySelector('#room-info h1')?.innerText || 'Room';
+
+                const receiptHTML = `
+        <p><strong>Name:</strong> ${name}</p>
+        <p><strong>Room:</strong> ${roomTitle}</p>
+        <p><strong>Check-in:</strong> ${checkIn}</p>
+        <p><strong>Check-out:</strong> ${checkOut}</p>
+        <p><strong>Guests:</strong> ${guests}</p>
+        <p><strong>Booking Time:</strong> ${dateNow}</p>
+        <p><em>Please show this receipt during check-in.</em></p>
+        <div class="qr-code">
+            <canvas id="qr-canvas"></canvas>
+        </div>
+    `;
+
+                // Вставляем квитанцию в DOM
+                document.getElementById('receipt-modal-content').innerHTML = receiptHTML;
+                document.getElementById('booking-form-section').classList.add('hidden');
+                document.getElementById('receipt-in-modal').classList.remove('hidden');
+
+                // Генерируем QR-код
+                setTimeout(() => {
+                    const canvas = document.getElementById('qr-canvas');
+                    if (canvas) {
+                        const qr = new QRious({
+                            element: canvas,
+                            size: 200,
+                            value: `${roomTitle}%${dateNow}%${name}%${checkIn}%${checkOut}`
+                        });
+                    }
+                }, 0);
+
+                // Скачиваем квитанцию, а после этого бронируем номер
+                setTimeout(() => {
+                    const receiptElement = document.getElementById('booking-modal-info');
+                    const oldBackground = receiptElement.style.background;
+                    const oldOpacity = receiptElement.style.opacity;
+                    receiptElement.style.background = '#fff';
+                    receiptElement.style.opacity = '1';
+
+                    // Скрываем кнопку "Download Receipt" временно
+                    const downloadBtn = document.getElementById('download-receipt-btn');
+                    if (downloadBtn) downloadBtn.style.display = 'none';
+
+                    html2canvas(receiptElement, {
+                        scale: 2,
+                        useCORS: true
+                    }).then(canvas => {
+                        const link = document.createElement('a');
+                        link.download = 'Booking_Receipt.png';
+                        link.href = canvas.toDataURL('image/png');
+                        link.click();
+                        receiptElement.style.background = oldBackground;
+                        receiptElement.style.opacity = oldOpacity;
+                        if (downloadBtn) downloadBtn.style.display = '';
+
+                        const newDates = getDateRange(checkIn, checkOut);
+                        fetch(`http://localhost:3001/api/rooms/${roomId}/book`, {
+                            method: 'PATCH',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ newDates })
+                        })
+                            .then(res => res.json())
+                            .then(data => {
+                                if (data.success) {
+                                    const roomObj = roomsData.find(r => r.id === roomId);
+                                    if (roomObj) {
+                                        roomObj.bookedDates = data.bookedDates;
+                                        roomObj.available = data.available;
+                                    }
+                                    showNotification('Booking successful! Receipt downloaded.', 'success');
+                                }
+                            });
+
+                    });
+                }, 200);
+            });
+
+            // Кнопка скачать квитанцию
+            document.getElementById('download-receipt-btn').addEventListener('click', () => {
+                const receiptElement = document.getElementById('booking-modal-info');
+                const oldBackground = receiptElement.style.background;
+                const oldOpacity = receiptElement.style.opacity;
+                receiptElement.style.background = '#fff';
+                receiptElement.style.opacity = '1';
+
+                const downloadBtn = document.getElementById('download-receipt-btn');
+                downloadBtn.style.display = 'none';
+
+                setTimeout(() => {
+                    html2canvas(receiptElement, {
+                        scale: 2,
+                        useCORS: true
+                    }).then(canvas => {
+                        const link = document.createElement('a');
+                        link.download = 'Booking_Receipt.png';
+                        link.href = canvas.toDataURL('image/png');
+                        link.click();
+
+                        receiptElement.style.background = oldBackground;
+                        receiptElement.style.opacity = oldOpacity;
+                        downloadBtn.style.display = '';
+                    });
+                }, 150);
+            });
+
+
+
+
+
+            fetch('http://localhost:3001/api/rooms')
+                .then(response => response.json())
+                .then(data => {
+                    roomsData = data.map(room => ({
+                        id: room.id,
+                        name: room.name,
+                        type: room.type,
+                        price: room.price,
+                        available: room.available,
+                        discounted: room.discounted,
+                        guests: room.guests,
+                        rating: room.rating,
+                        image: room.image,
+                        description: room.description,
+                        bookedDates: room.bookedDates || []
+                    }));
+                    renderRooms();
+                });
+
+            function renderRooms() {
+                const type = typeSelect.value;
+                const filter = filterSelect.value;
+                const guests = parseInt(guestsSelect.value);
+                const sortBy = sortSelect.value;
+
+                roomContainer.innerHTML = '';
+
+                let filteredRooms = roomsData.filter(room => {
+                    const matchesFilter =
+                        filter === 'all-rooms' ||
+                        (filter === 'available' && room.available) ||
+                        (filter === 'discounted' && room.discounted);
+
+                    return matchesFilter;
+                });
+
+                function getDateRange(start, end) {
+                    const range = [];
+                    let current = new Date(start);
+                    const last = new Date(end);
+                    while (current <= last) {
+                        range.push(current.toISOString().split('T')[0]);
+                        current.setDate(current.getDate() + 1);
+                    }
+                    return range;
+                }
+
+
+                if (renderRooms.applySearchFilters) {
+                    filteredRooms = filteredRooms.filter(room => {
+                        const matchesType = type === 'all' || room.type === type;
+                        const matchesGuests = isNaN(guests) || room.guests >= guests;
+
+                        // Работа с датами
+                        const checkIn = checkInInput.value;
+                        const checkOut = checkOutInput.value;
+                        let isAvailableInDate = true;
+
+                        if (checkIn && checkOut && room.bookedDates) {
+                            const desiredDates = getDateRange(checkIn, checkOut);
+                            isAvailableInDate = !desiredDates.some(date => room.bookedDates.includes(date));
+                        }
+
+                        return matchesType && matchesGuests && isAvailableInDate;
+                    });
+                }
+
+                if (sortBy === 'price-low') {
+                    filteredRooms.sort((a, b) => a.price - b.price);
+                } else if (sortBy === 'price-high') {
+                    filteredRooms.sort((a, b) => b.price - a.price);
+                } else if (sortBy === 'rating') {
+                    filteredRooms.sort((a, b) => (b.rating || 0) - (a.rating || 0));
+                }
+
+                filteredRooms.forEach(room => {
+                    const card = createRoomCard(room);
+                    roomContainer.appendChild(card);
+                });
+                if (window.observeFadeInScale) window.observeFadeInScale();
+            }
+
+            renderRooms.applySearchFilters = false;
+
+            searchBtn.addEventListener('click', function (e) {
+                availabilityChecked = true;
+                e.preventDefault();
+                renderRooms.applySearchFilters = true;
+                renderRooms();
+            });
+
+            filterSelect.addEventListener('change', renderRooms);
+            sortSelect.addEventListener('change', renderRooms);
+
+            const cardNumberInput = document.getElementById('card-number');
+            cardNumberInput.addEventListener('input', () => {
+                let value = cardNumberInput.value.replace(/\D/g, '');
+                value = value.substring(0, 16);
+                cardNumberInput.value = value.replace(/(.{4})/g, '$1 ').trim();
+            });
+
+            const cardExpiryInput = document.getElementById('card-expiry');
+            cardExpiryInput.addEventListener('input', () => {
+                let value = cardExpiryInput.value.replace(/\D/g, '');
+                if (value.length > 2) {
+                    let mm = value.slice(0, 2);
+                    let yy = value.slice(2, 4);
+                    // Ограничиваем месяц от 01 до 12
+                    if (parseInt(mm, 10) > 12) mm = '12';
+                    if (mm.length === 1 && mm > '1') mm = '0' + mm; // 2 -> 02
+                    value = mm + (yy ? '/' + yy : '');
+                }
+                else {
+                    value = value;
+                }
+                cardExpiryInput.value = value;
+            });
+
+        });
+
+    </script>
+    <script src="js/Login.js"></script>
+
+
+
+    </div>
+</body>
+
+</html>
