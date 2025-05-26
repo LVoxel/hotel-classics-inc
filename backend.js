@@ -4,30 +4,20 @@ const bodyParser = require('body-parser');
 const mysql = require('mysql2');
 
 const app = express();
-const PORT = process.env.PORT || 5000;
+const PORT = 3306;
 
 app.use(cors());
 app.use(bodyParser.json({ limit: '5mb' }));
 
 const db = mysql.createPool({
-    host: 'rudy.zzz.com.ua',
-    user: 'olekksa',
+    host: 'localhost',
+    user: 'root',
     password: 'jk2h3fIUl2k3jriIQJKK!',
-    database: 'olekksa',
+    database: 'hotel_db',
     port: 3306,
     waitForConnections: true,
     connectionLimit: 10,
     queueLimit: 0
-});
-
-// Тест подключения к базе данных
-db.getConnection((err, connection) => {
-    if (err) {
-        console.error('Ошибка подключения к базе данных:', err);
-    } else {
-        console.log('Успешно подключен к базе данных MySQL');
-        connection.release();
-    }
 });
 
 db.query(`
@@ -44,7 +34,7 @@ CREATE TABLE IF NOT EXISTS rooms (
     description TEXT,
     bookedDates TEXT
 );
-`, (err) => { if (err) console.error('Ошибка создания таблицы rooms:', err); });
+`, (err) => { if (err) console.error(err); });
 
 db.query(`
 CREATE TABLE IF NOT EXISTS users (
@@ -54,7 +44,7 @@ CREATE TABLE IF NOT EXISTS users (
     password VARCHAR(255) NOT NULL,
     isAdmin TINYINT DEFAULT 0
 );
-`, (err) => { if (err) console.error('Ошибка создания таблицы users:', err); });
+`, (err) => { if (err) console.error(err); });
 
 // Получить все номера
 app.get('/api/rooms', (req, res) => {
@@ -187,5 +177,5 @@ app.post('/api/login', (req, res) => {
 });
 
 app.listen(PORT, () => {
-    console.log(`Server running on port ${PORT}`);
+    console.log(`Server running on http://localhost:${PORT}`);
 });
