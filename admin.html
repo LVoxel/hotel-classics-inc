@@ -163,10 +163,16 @@
         }
 
         function fetchRooms() {
-            fetch('http://localhost:3001/api/rooms')
+            fetch('rooms.php')
                 .then(res => res.json())
                 .then(data => {
-                    rooms = data;
+                    // bookedDates может быть строкой (JSON), приводим к массиву
+                    rooms = data.map(room => ({
+                        ...room,
+                        bookedDates: typeof room.bookedDates === 'string'
+                            ? JSON.parse(room.bookedDates || '[]')
+                            : (room.bookedDates || [])
+                    }));
                     renderRooms();
                 });
         }
@@ -177,7 +183,7 @@
             if (e.target.classList.contains('btn-delete')) {
                 const id = e.target.getAttribute('data-id');
                 if (id) {
-                    fetch(`http://localhost:3001/api/rooms/${id}`, { method: 'DELETE' })
+                    fetch(`rooms.php?id=${id}`, { method: 'DELETE' })
                         .then(() => fetchRooms());
                 }
             }
@@ -202,7 +208,7 @@
             }
         });
 
-        // Добавление комнаты
+        // Добавление/редактирование комнаты
         document.getElementById('add-room-form').addEventListener('submit', function (e) {
             e.preventDefault();
             const name = document.getElementById('room-name').value.trim();
@@ -220,7 +226,10 @@
             const available = document.getElementById('room-available').checked;
             const discounted = document.getElementById('room-discounted').checked;
 
-            if (!name || !type || !price || !guests || !image || !description || isNaN(rating)) return;
+            if (!name || !type || !price || !guests || !image || !description || isNaN(rating)) {
+                alert('Please fill in all fields correctly!');
+                return;
+            }
 
             const editId = this.getAttribute('data-edit-id');
             const roomData = {
@@ -233,27 +242,43 @@
 
             if (editId) {
                 // Редактирование
-                fetch(`http://localhost:3001/api/rooms/${editId}`, {
+                fetch(`rooms.php?id=${editId}`, {
                     method: 'PUT',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(roomData)
                 })
-                    .then(() => {
+                .then(res => res.json())
+                .then(data => {
+                    if (!data.success) {
+                        alert(data.error || 'Error updating room');
+                    } else {
                         fetchRooms();
                         this.reset();
                         this.removeAttribute('data-edit-id');
                         document.querySelector('#add-room-form button[type="submit"]').textContent = 'Add Room';
-                    });
+                    }
+                })
+                .catch(err => {
+                    alert('Network or server error: ' + err);
+                });
             } else {
                 // Добавление
-                fetch('http://localhost:3001/api/rooms', {
+                fetch('rooms.php', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(roomData)
                 })
-                    .then(() => {
-                        fetchRooms();
-                        this.reset();
+                    .then(res => res.json())
+                    .then(data => {
+                        if (!data.success) {
+                            alert(data.error || 'Error saving room');
+                        } else {
+                            fetchRooms();
+                            this.reset();
+                        }
+                    })
+                    .catch(err => {
+                        alert('Network or server error: ' + err);
                     });
             }
         });

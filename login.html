@@ -80,21 +80,26 @@
             const email = document.getElementById('register-email').value.trim();
             const password = document.getElementById('register-password').value.trim();
 
-            fetch('http://shortline.proxy.rlwy.net/api/users', {
+            fetch('users.php', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ name, email, password })
             })
-                .then(res => res.json())
-                .then(data => {
-                    if (data.error) {
-                        showNotification(data.error, 'error');
-                    } else {
-                        showNotification('Registration successful! You can now log in.', 'success');
-                        setTimeout(() => {
-                            document.querySelector('#register-form form').reset();
-                            toggleForms();
-                        }, 1200);
+                .then(res => res.text())
+                .then(text => {
+                    console.log(text);
+                    try {
+                        const data = JSON.parse(text);
+                        if (data.error) showNotification(data.error, 'error');
+                        else {
+                            showNotification('Login successful!', 'success');
+                            localStorage.setItem('currentUser', JSON.stringify(data));
+                            setTimeout(() => {
+                                window.location.href = 'index.html';
+                            }, 1200);
+                        }
+                    } catch (e) {
+                        console.error('Invalid JSON from server:', text);
                     }
                 });
         });
@@ -106,7 +111,7 @@
             const email = document.getElementById('login-email').value.trim();
             const password = document.getElementById('login-password').value.trim();
 
-            fetch('http://shortline.proxy.rlwy.net/api/login', {
+            fetch('users.php?action=login', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ email, password })

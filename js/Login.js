@@ -1,9 +1,13 @@
 document.addEventListener('DOMContentLoaded', function () {
-    const currentUser = JSON.parse(localStorage.getItem('currentUser'));
-    const isIndexPage = window.location.pathname.endsWith('index.html') || window.location.pathname === '/';
+    const path = window.location.pathname;
+    const isLogin = path.endsWith('login.html');
+    const isIndex = path.endsWith('index.html') || path === '/';
 
-    if (!currentUser && !isIndexPage) {
-        window.location.href = 'login.html';
+    if (!isLogin && !isIndex) {
+        const currentUser = JSON.parse(localStorage.getItem('currentUser'));
+        if (!currentUser) {
+            window.location.href = 'login.html';
+        }
     }
 });
 
@@ -42,10 +46,10 @@ document.addEventListener('DOMContentLoaded', function () {
 function checkUserExists() {
     const currentUser = JSON.parse(localStorage.getItem('currentUser'));
     if (!currentUser) return;
-    fetch(`http://shortline.proxy.rlwy.net/api/users`)
+    fetch('users.php')
         .then(res => res.json())
         .then(users => {
-            const exists = users.some(u => u.id === currentUser.id);
+            const exists = users.some(u => String(u.id) === String(currentUser.id));
             if (!exists) {
                 localStorage.removeItem('currentUser');
                 window.location.href = 'login.html';
@@ -55,3 +59,23 @@ function checkUserExists() {
 
 // Проверка при загрузке каждой страницы
 document.addEventListener('DOMContentLoaded', checkUserExists);
+
+function loginUser(email, password) {
+    fetch('users.php?action=login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password })
+    })
+        .then(res => res.json())
+        .then(data => {
+            if (data.error) {
+                showNotification(data.error, 'error');
+            } else {
+                showNotification('Login successful!', 'success');
+                localStorage.setItem('currentUser', JSON.stringify(data));
+                setTimeout(() => {
+                    window.location.href = 'index.html';
+                }, 1200);
+            }
+        });
+}

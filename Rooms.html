@@ -419,7 +419,7 @@
                         if (downloadBtn) downloadBtn.style.display = '';
 
                         const newDates = getDateRange(checkIn, checkOut);
-                        fetch(`http://localhost:3001/api/rooms/${roomId}/book`, {
+                        fetch(`rooms.php?id=${roomId}`, {
                             method: 'PATCH',
                             headers: { 'Content-Type': 'application/json' },
                             body: JSON.stringify({ newDates })
@@ -472,7 +472,7 @@
 
 
 
-            fetch('http://localhost:3001/api/rooms')
+            fetch('rooms.php')
                 .then(response => response.json())
                 .then(data => {
                     roomsData = data.map(room => ({
