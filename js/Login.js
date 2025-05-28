@@ -3,12 +3,12 @@ document.addEventListener('DOMContentLoaded', function () {
     const isLogin = path.endsWith('login.html');
     const isIndex = path.endsWith('index.html') || path === '/';
 
-    if (!isLogin && !isIndex) {
-        const currentUser = JSON.parse(localStorage.getItem('currentUser'));
-        if (!currentUser) {
-            window.location.href = 'login.html';
-        }
-    }
+    // if (!isLogin && !isIndex) {
+    //     const currentUser = JSON.parse(localStorage.getItem('currentUser'));
+    //     if (!currentUser) {
+    //         window.location.href = 'login.html';
+    //     }
+    // }
 });
 
 
