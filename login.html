@@ -92,10 +92,10 @@
                         const data = JSON.parse(text);
                         if (data.error) showNotification(data.error, 'error');
                         else {
-                            showNotification('Login successful!', 'success');
-                            localStorage.setItem('currentUser', JSON.stringify(data));
+                            showNotification('Registration successful! You can now log in.', 'success');
                             setTimeout(() => {
-                                window.location.href = 'index.html';
+                                document.querySelector('#register-form form').reset();
+                                toggleForms();
                             }, 1200);
                         }
                     } catch (e) {
